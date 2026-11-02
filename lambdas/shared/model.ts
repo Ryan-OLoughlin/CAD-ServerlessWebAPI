@@ -49,5 +49,8 @@ export const toActor = ({ actorId, name, dateOfBirth, bio }: Record<string, any>
 });
 
 // Parses a path or query string ID; undefined if it isn't a positive integer.
-export const parseId = (value: string | undefined): number | undefined =>
-  value !== undefined && /^[1-9]\d*$/.test(value) ? Number(value) : undefined;
+export const parseId = (value: string | undefined): number | undefined => {
+  if (value === undefined || !/^[1-9]\d*$/.test(value)) return undefined;
+  const id = Number(value);
+  return Number.isSafeInteger(id) ? id : undefined;
+};
