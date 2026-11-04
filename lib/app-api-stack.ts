@@ -105,9 +105,36 @@ export class AppApiStack extends cdk.Stack {
 
     const addMovieRoleResource = moviesResource.addResource('roles');
 
-    addMovieRoleResource.addMethod(
+    const addMovieRoleMethod = addMovieRoleResource.addMethod(
       'POST',
-      new apig.LambdaIntegration(addMovieRoleFn)
+      new apig.LambdaIntegration(addMovieRoleFn),
+      {
+        apiKeyRequired: true,
+      }
     );
+
+    // Administrator API key
+    const adminApiKey = api.addApiKey('AdminApiKey', {
+      apiKeyName: 'MovieRolesAdminKey',
+      description: 'Administrator API key for creating movie roles',
+    });
+
+    // Usage plan
+    const adminUsagePlan = api.addUsagePlan('AdminUsagePlan', {
+      name: 'AdminUsagePlan',
+    });
+
+    // Associate the API key with the usage plan
+    adminUsagePlan.addApiKey(adminApiKey);
+
+    // Associate the usage plan with the deployed API stage
+    adminUsagePlan.addApiStage({
+      stage: api.deploymentStage,
+    });
+
+    // Output API Key ID for administrator access
+    new cdk.CfnOutput(this, 'AdminApiKeyId', {
+    value: adminApiKey.keyId,
+    description: 'API Gateway administrator key ID'});
   }
 }
