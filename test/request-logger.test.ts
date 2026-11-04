@@ -25,4 +25,26 @@ describe('logRequest', () => {
     expect(log).toHaveBeenCalledWith('anonymous   /actors/4321');
     log.mockRestore();
   });
+
+  it('logs the API key ID for administrator requests', () => {
+  const log = jest.spyOn(console, 'log').mockImplementation(() => undefined);
+
+  const event = createEvent({ path: '/movies/roles' });
+
+  const requestContext = event.requestContext as unknown as {
+    authorizer?: unknown;
+    identity?: { apiKeyId: string | null };
+  };
+
+  requestContext.authorizer = undefined;
+  requestContext.identity = { apiKeyId: 'test-api-key-id' };
+
+  logRequest(event);
+
+  expect(log).toHaveBeenCalledWith(
+    'api-key:test-api-key-id   /movies/roles',
+  );
+
+  log.mockRestore();
+});
 });

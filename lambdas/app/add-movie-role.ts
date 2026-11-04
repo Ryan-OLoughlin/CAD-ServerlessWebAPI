@@ -2,6 +2,7 @@ import type { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { GetCommand, PutCommand } from '@aws-sdk/lib-dynamodb';
 import { actorKey, ddb, movieKey, type Role, tableName } from '../shared/db';
 import { isResponse, parseJsonObject, response } from '../shared/http';
+import { logRequest } from '../shared/request-logger';
 
 const isValidId = (value: unknown): value is number =>
   typeof value === 'number' && Number.isSafeInteger(value) && value > 0;
@@ -12,6 +13,7 @@ const isNonEmptyString = (value: unknown): value is string =>
 export const handler = async (
   event: APIGatewayProxyEvent,
 ): Promise<APIGatewayProxyResult> => {
+  logRequest(event);
   const body = parseJsonObject(event);
   if (isResponse(body)) return body;
 
