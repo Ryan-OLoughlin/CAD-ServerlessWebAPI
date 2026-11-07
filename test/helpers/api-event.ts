@@ -4,8 +4,10 @@ export const createEvent = (options: {
   path?: string;
   pathParameters?: APIGatewayProxyEvent['pathParameters'];
   queryStringParameters?: APIGatewayProxyEvent['queryStringParameters'];
+  body?: string | null;
 } = {}): APIGatewayProxyEvent => ({
   path: options.path ?? '/',
+  body: options.body ?? null,
   pathParameters: options.pathParameters ?? null,
   queryStringParameters: options.queryStringParameters ?? null,
   requestContext: {
